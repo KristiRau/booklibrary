@@ -17,29 +17,53 @@ public class BookController {
 
 
     @PostMapping("/books/add")
-    public String postBook(@RequestBody Book book) {
+    public List<Book> postBook(@RequestBody Book book) {
+        int id = 1;
+        if (!bookList.isEmpty()) {
+            Book lastBook = bookList.get(bookList.size() - 1);
+            int lastId = lastBook.getId();
+            id = lastId + 1;
+        }
 
         if (book.getName() != null && book.getAuthor() != null && book.getYear() > 1500) {
+            book.setId(id);
             bookList.add(book);
-            return CODE_OK;
-        } else {
-            return CODE_NOK;
         }
+            return bookList;
     }
 
     @DeleteMapping("/books/delete")
-    public String removeBook(@RequestBody Book book) {
-        System.out.println("Start");
+    public List<Book> removeBook(@RequestBody Book book) {
         Iterator<Book> booksIterator = bookList.iterator();
 
         while(booksIterator.hasNext()) {
             Book temp = booksIterator.next();
-            if (book.getAuthor().equals(temp.getAuthor()) && book.getName().equals(temp.getName()) && book.getYear() == temp.getYear()) {
+            if (book.getId() == temp.getId()) {
                 booksIterator.remove();
                 break;
             }
         }
-        return CODE_OK;
+        return bookList;
+    }
+
+    @PostMapping("/books/update")
+    public List<Book> updateBook(@RequestBody Book book) {
+        Iterator<Book> booksIterator = bookList.iterator();
+
+        while(booksIterator.hasNext()) {
+            Book temp = booksIterator.next();
+
+            if (book.getId() == temp.getId()) {
+
+                if (book.getName() != null && book.getAuthor() != null && book.getYear() > 1500) {
+                    temp.setName(book.getName());
+                    temp.setAuthor(book.getAuthor());
+                    temp.setYear(book.getYear());
+                    break;
+                }
+            }
+        }
+        return bookList;
     }
 
     @GetMapping("/books")
@@ -54,20 +78,32 @@ public class BookController {
 
         while(booksIterator.hasNext()) {
             Book temp = booksIterator.next();
-            if (book.getAuthor() != null && book.getName() != null) {
+            if (book.getAuthor() != null && book.getName() != null && book.getYear() > 1500) {
                 if (book.getAuthor().equals(temp.getAuthor()) && book.getName().equals(temp.getName()) && book.getYear() == temp.getYear()) {
                     books.add(temp);
                 }
-            } else if (book.getName() != null) {
+            } else if (book.getName() != null && book.getYear() > 1500) {
                 if (book.getName().equals(temp.getName()) && book.getYear() == temp.getYear()) {
                     books.add(temp);
                 }
-            } else if (book.getAuthor() != null) {
+            } else if (book.getAuthor() != null && book.getYear() > 1500) {
                 if (book.getAuthor().equals(temp.getAuthor()) && book.getYear() == temp.getYear()) {
+                    books.add(temp);
+                }
+            } else if (book.getAuthor() != null && book.getName() != null) {
+                if (book.getAuthor().equals(temp.getAuthor()) && book.getName().equals(temp.getName())) {
                     books.add(temp);
                 }
             } else if (book.getYear() > 1500) {
                 if (book.getYear() == temp.getYear()) {
+                    books.add(temp);
+                }
+            } else if (book.getAuthor() != null) {
+                if (book.getAuthor().equals(temp.getAuthor())) {
+                    books.add(temp);
+                }
+            } else if (book.getName() != null) {
+                if (book.getName().equals(temp.getName())) {
                     books.add(temp);
                 }
             }
@@ -78,4 +114,7 @@ public class BookController {
 
 
 
+
 }
+
+
