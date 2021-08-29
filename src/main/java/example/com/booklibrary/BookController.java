@@ -15,10 +15,6 @@ public class BookController {
     @Autowired
     private BookRepository bookRepository;
 
-    private List<Book> bookList = new ArrayList<>();
-    private final String CODE_OK = "1";
-    private final String CODE_NOK = "-1";
-
 
     @PostMapping("/books/add")
     public Iterable<Book> postBook(@RequestBody Book book) {
@@ -46,7 +42,7 @@ public class BookController {
     @DeleteMapping("/books/delete/")
     public Iterable<Book> removeBook(@RequestBody Book book) {
 
-        bookRepository.delete(book); // ainult raamatu id'st piisab et kustutada
+        bookRepository.delete(book);
 
         return bookRepository.findAll();
     }
@@ -67,21 +63,8 @@ public class BookController {
 
     @PostMapping("/books/update")
     public Iterable<Book> updateBook(@RequestBody Book book) {
-        Iterator<Book> booksIterator = bookRepository.findAll().iterator();
-
-        while(booksIterator.hasNext()) {
-            Book temp = booksIterator.next();
-
-            if (book.getId() == temp.getId()) {
-
-                if (book.getName() != null && book.getAuthor() != null && book.getYear() > 1500) {
-                    temp.setName(book.getName());
-                    temp.setAuthor(book.getAuthor());
-                    temp.setYear(book.getYear());
-                    bookRepository.save(book);
-                    break;
-                }
-            }
+        if(bookRepository.existsById(book.getId())) {
+            bookRepository.save(book);
         }
         return bookRepository.findAll();
     }
